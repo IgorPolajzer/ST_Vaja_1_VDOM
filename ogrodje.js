@@ -1,4 +1,3 @@
-
 // HTML element factory function.
 const makeElement = (type) => (props = {}, children = []) => {
     return {
@@ -19,20 +18,20 @@ const setProps = (element, props) => {
             }
 
             if (key === 'style' && typeof value === 'object') {
-              Object.assign(element.style, value);
-              return;
+                Object.assign(element.style, value);
+                return;
             }
 
             if (key.startsWith('on') && typeof value === 'function') {
-              const eventName = key.slice(2).toLowerCase();
-              element.addEventListener(eventName, value);
-              return;
+                const eventName = key.slice(2).toLowerCase();
+                element.addEventListener(eventName, value);
+                return;
             }
 
             if (typeof value === 'boolean') {
-              if (value) element.setAttribute(key, '');
-              else element.removeAttribute(key);
-              return;
+                if (value) element.setAttribute(key, '');
+                else element.removeAttribute(key);
+                return;
             }
 
             element.setAttribute(key, props[key])
@@ -68,9 +67,9 @@ const renderer = ({type, children = [], props = {}}) => {
 }
 
 
-const areObjectsDifferent = (obj1, obj2) => {
-   const allKeys = Array.from(new Set([...Object.keys(obj1), ...Object.keys(obj2)]));
-   return allKeys.some(key => obj1[key] !== obj2[key]);
+const areObjectsDifferent = (obj1 = {}, obj2 = {}) => {
+    const allKeys = Array.from(new Set([...Object.keys(obj1), ...Object.keys(obj2)]));
+    return allKeys.some(key => obj1[key] !== obj2[key]);
 }
 
 const areaNodesDiff = (oldNode, newNode) => {
