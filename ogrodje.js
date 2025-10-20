@@ -1,5 +1,5 @@
 
-// Component factory function for creating HTML components with a specified tag, attributes, and children.
+// HTML element factory function.
 const makeElement = (type) => (props = {}, children = []) => {
     return {
         type,
@@ -44,7 +44,7 @@ const setProps = (element, props) => {
 const renderer = ({type, children = [], props = {}}) => {
     const element = document.createElement(type);
     if (element.id === null || element.id === "") {
-        element.id = `id_${Math.random().toString(36).substr(2, 9)}`;
+        element.id = `id-${crypto.randomUUID()}`;
     }
     props.id = element.id;
     setProps(element, props);
@@ -66,6 +66,7 @@ const renderer = ({type, children = [], props = {}}) => {
 
     return element;
 }
+
 
 const areObjectsDifferent = (obj1, obj2) => {
    const allKeys = Array.from(new Set([...Object.keys(obj1), ...Object.keys(obj2)]));
@@ -97,7 +98,7 @@ const diffAndReRender = (currentNode, previousNode) => {
 
     } else {
         currentNode.children.forEach((child, index) => {
-            diffAndReRender(previousNode.children[index], child);
+            diffAndReRender(child, previousNode.children[index]);
         })
     }
 }

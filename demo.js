@@ -4,24 +4,41 @@ const ol = makeElement("ol");
 const li = makeElement("li");
 
 let style = undefined;
-const app = (style) => (
-    ol({ className: "seznam"}, [
-        li({ style: style}, [ 1 ]),
-        li({}, [ 2 ]),
-        li({}, [ 3 ])
-    ])
-)
+
+const generateComments = (number) => {
+    let comments = [];
+    for (let i = 0; i < number; i++) {
+        comments.push(li({}, [ `Comment  ${i}` ]));
+    }
+
+    return comments;
+}
+
+const app = (style) => {
+    const numberOfComments = 10000;
+    const comments = generateComments(numberOfComments);
+    const numberOfChanges = Math.floor(Math.random() * (numberOfComments));
+
+    if (style !== undefined) {
+        for (let i = 0; i < numberOfChanges; i++) {
+            const index = Math.floor(Math.random() * (numberOfComments))
+            comments[index].props.style = style;
+        }
+    }
+
+    return ol({className: "seznam"}, comments);
+}
 
 const root = document.querySelector("#root");
-const virtualDomTree = app();
+const virtualDomTree = app(style);
 root.appendChild(renderer(virtualDomTree));
 
 setInterval(() => {
     style = (style === undefined) ? "color:red" : undefined;
-    const newDOM = app(style)
+    const newVirtualDomTree = app(style)
 
     let start = Date.now();
-    diffAndReRender(newDOM, virtualDomTree);
+    diffAndReRender(newVirtualDomTree, virtualDomTree);
     console.log(`Execution time: ${Date.now() - start} milliseconds`);
 
 }, 1000)
