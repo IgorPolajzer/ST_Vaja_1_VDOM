@@ -37,26 +37,35 @@ const changeRandomCommentsStyle = (virtualDOM, numberOfChanges, style) => {
 const root = document.querySelector("#root");
 let virtualDomTree = app();
 root.innerHTML = "";
-root.appendChild(renderer(virtualDomTree)); // renderer mutates `virtualDomTree.props.id`
+root.appendChild(renderer(virtualDomTree));
 
 const testChanges = [10, 20, 50, 100, 300, 500, 1000];
+const numberOfIterations = 5;
 
 testChanges.forEach(changes => {
-    // create a deep copy of the baseline VDOM and apply random style changes
-    const newVirtualDomTree = JSON.parse(JSON.stringify(virtualDomTree));
-    changeRandomCommentsStyle(newVirtualDomTree, changes, "color:red");
+    let resultDiff = 0;
+    let resultFull = 0;
+    for (let i = 0; i < numberOfIterations; i++) {
+        // create a deep copy of the baseline VDOM and apply random style changes
+        const newVirtualDomTree = JSON.parse(JSON.stringify(virtualDomTree));
+        changeRandomCommentsStyle(newVirtualDomTree, changes, "color:red");
 
-    // Measure full render time (replace root's children, not the root element)
-    root.innerHTML = "";
-    root.appendChild(renderer(virtualDomTree)); // restore baseline DOM
-    const startFullRender = performance.now();
-    root.replaceChildren(renderer(newVirtualDomTree)); // keep root element stable
-    console.log(`Full render time: ${performance.now() - startFullRender} milliseconds`);
+        // Measure full render time (replace root's children, not the root element)
+        root.innerHTML = "";
+        root.appendChild(renderer(virtualDomTree)); // restore baseline DOM
+        const startFullRender = performance.now();
+        root.replaceChildren(renderer(newVirtualDomTree)); // keep root element stable
+        resultFull += performance.now() - startFullRender;
+        //console.log(`Full render time: ${performance.now() - startFullRender} milliseconds`);
 
-    // Reset to baseline DOM and measure diff+re-render
-    root.innerHTML = "";
-    root.appendChild(renderer(virtualDomTree)); // baseline DOM again
-    const startDiffRender = performance.now();
-    diffAndReRender(newVirtualDomTree, virtualDomTree);
-    console.log(`Diff time: ${performance.now() - startDiffRender} milliseconds`);
+        // Reset to baseline DOM and measure diff+re-render
+        root.innerHTML = "";
+        root.appendChild(renderer(virtualDomTree)); // baseline DOM again
+        const startDiffRender = performance.now();
+        diffAndReRender(newVirtualDomTree, virtualDomTree);
+        resultDiff += performance.now() - startDiffRender;
+        //console.log(`Diff time: ${performance.now() - startDiffRender} milliseconds`);
+    }
+    console.log(`Average full render time for ${changes} changes: ${resultFull / numberOfIterations} milliseconds`);
+    console.log(`Average diff+re-render time for ${changes} changes: ${resultDiff / numberOfIterations} milliseconds`);
 });
