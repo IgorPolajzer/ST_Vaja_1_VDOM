@@ -3,8 +3,6 @@ import { makeElement, renderer, diffAndReRender } from "./ogrodje.js";
 const ol = makeElement("ol");
 const li = makeElement("li");
 
-let style = undefined;
-
 const generateComments = (number) => {
     let comments = [];
     for (let i = 0; i < number; i++) {
@@ -46,25 +44,23 @@ testChanges.forEach(changes => {
     let resultDiff = 0;
     let resultFull = 0;
     for (let i = 0; i < numberOfIterations; i++) {
-        // create a deep copy of the baseline VDOM and apply random style changes
+        // create a deep copy of the baseline VDOM and apply style changes
         const newVirtualDomTree = JSON.parse(JSON.stringify(virtualDomTree));
         changeRandomCommentsStyle(newVirtualDomTree, changes, "color:red");
 
-        // Measure full render time (replace root's children, not the root element)
+        // Measure full render time
         root.innerHTML = "";
-        root.appendChild(renderer(virtualDomTree)); // restore baseline DOM
+        root.appendChild(renderer(virtualDomTree));
         const startFullRender = performance.now();
-        root.replaceChildren(renderer(newVirtualDomTree)); // keep root element stable
+        root.replaceChildren(renderer(newVirtualDomTree));
         resultFull += performance.now() - startFullRender;
-        //console.log(`Full render time: ${performance.now() - startFullRender} milliseconds`);
 
-        // Reset to baseline DOM and measure diff+re-render
+        // Reset to baseline DOM and measure diff rerender
         root.innerHTML = "";
-        root.appendChild(renderer(virtualDomTree)); // baseline DOM again
+        root.appendChild(renderer(virtualDomTree));
         const startDiffRender = performance.now();
         diffAndReRender(newVirtualDomTree, virtualDomTree);
         resultDiff += performance.now() - startDiffRender;
-        //console.log(`Diff time: ${performance.now() - startDiffRender} milliseconds`);
     }
     console.log(`Average full render time for ${changes} changes: ${resultFull / numberOfIterations} milliseconds`);
     console.log(`Average diff+re-render time for ${changes} changes: ${resultDiff / numberOfIterations} milliseconds`);

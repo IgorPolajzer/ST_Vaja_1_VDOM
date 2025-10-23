@@ -48,7 +48,6 @@ const renderer = ({type, children = [], props = {}}) => {
     props.id = element.id;
     setProps(element, props);
 
-    // If children is a string, it to innerHtml of the current HTML element.
     if (Array.isArray(children)) {
         children.forEach(child => {
             if (child == null) return;
